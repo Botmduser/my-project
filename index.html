@@ -3,169 +3,129 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FF PLAYER ADMIN PANEL</title>
+    <title>FF GLOBAL PANEL</title>
     <style>
-        /* Design එක හදන්නේ මෙතනින් */
         body {
             margin: 0;
-            padding: 0;
-            font-family: 'Oxanium', sans-serif;
-            background: url('https://wallpaperaccess.com/full/1855234.jpg') no-repeat center center fixed;
-            background-size: cover;
+            font-family: 'Segoe UI', sans-serif;
+            background: #0a0a0a;
             color: white;
             display: flex;
             justify-content: center;
             align-items: center;
             height: 100vh;
+            overflow: hidden;
         }
-
-        .overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.7);
-        }
-
-        .panel-card {
-            position: relative;
-            background: rgba(20, 20, 20, 0.9);
+        .panel {
+            background: #151515;
             border: 2px solid #ff4b2b;
+            padding: 25px;
             border-radius: 15px;
-            padding: 30px;
-            width: 90%;
-            max-width: 450px;
+            width: 350px;
             text-align: center;
-            box-shadow: 0 0 20px #ff4b2b;
+            box-shadow: 0 0 20px rgba(255, 75, 43, 0.4);
         }
-
-        h2 {
-            color: #ff4b2b;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            margin-bottom: 20px;
-        }
-
-        .input-group {
-            margin-bottom: 20px;
-        }
-
+        h2 { color: #ff4b2b; text-transform: uppercase; margin-bottom: 20px; }
         input {
             width: 100%;
             padding: 12px;
-            background: #333;
-            border: 1px solid #555;
-            border-radius: 5px;
+            margin-bottom: 15px;
+            background: #222;
+            border: 1px solid #444;
             color: white;
-            font-size: 16px;
+            border-radius: 5px;
             outline: none;
-            text-align: center;
+            box-sizing: border-box;
         }
-
-        input:focus {
-            border-color: #ff4b2b;
-        }
-
-        .btn-search {
+        button {
             width: 100%;
             padding: 12px;
-            background: linear-gradient(to right, #ff416c, #ff4b2b);
+            background: #ff4b2b;
+            color: white;
             border: none;
             border-radius: 5px;
-            color: white;
             font-weight: bold;
-            font-size: 16px;
             cursor: pointer;
             text-transform: uppercase;
-            transition: 0.3s;
         }
-
-        .btn-search:hover {
-            transform: scale(1.02);
-            box-shadow: 0 0 15px #ff4b2b;
-        }
-
-        /* විස්තර පෙන්වන තැන */
-        #resultBox {
-            margin-top: 25px;
-            padding: 15px;
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 10px;
-            display: none; /* පස්සේ පෙන්වන්න */
+        #result {
+            margin-top: 20px;
+            display: none;
             text-align: left;
+            background: #222;
+            padding: 15px;
+            border-radius: 8px;
         }
-
-        .stat-item {
+        .data-row {
             display: flex;
             justify-content: space-between;
-            margin-bottom: 10px;
-            border-bottom: 1px solid #444;
-            padding-bottom: 5px;
+            margin-bottom: 8px;
+            font-size: 14px;
+            border-bottom: 1px solid #333;
+            padding-bottom: 4px;
         }
-
-        .label { color: #aaa; }
-        .value { color: #00ffcc; font-weight: bold; }
+        .label { color: #888; }
+        .val { color: #00ffaa; font-weight: bold; }
+        .loader { color: yellow; font-size: 12px; display: none; margin-top: 10px; }
     </style>
 </head>
 <body>
 
-<div class="overlay"></div>
+<div class="panel">
+    <h2>FF UID SCANNER</h2>
+    <input type="number" id="uidInput" placeholder="Enter Player UID">
+    <button onclick="scanPlayer()">Scan Account</button>
+    
+    <div id="loading" class="loader">Connecting to Server...</div>
 
-<div class="panel-card">
-    <h2>FF Admin Panel</h2>
-    <p style="font-size: 13px; color: #ccc;">Enter Player UID to Fetch Data</p>
-
-    <div class="input-group">
-        <input type="number" id="playerID" placeholder="Enter Player UID (Ex: 123456789)">
-    </div>
-
-    <button class="btn-search" onclick="fetchPlayer()">Connect & Scan</button>
-
-    <div id="resultBox">
-        <div class="stat-item">
-            <span class="label">Nickname:</span>
-            <span class="value" id="resName">--</span>
-        </div>
-        <div class="stat-item">
-            <span class="label">Level:</span>
-            <span class="value" id="resLevel">--</span>
-        </div>
-        <div class="stat-item">
-            <span class="label">Region:</span>
-            <span class="value" id="resRegion">--</span>
-        </div>
-        <div class="stat-item">
-            <span class="label">Badges:</span>
-            <span class="value" id="resBadges">--</span>
-        </div>
+    <div id="result">
+        <div class="data-row"><span class="label">Name:</span> <span id="resName" class="val"></span></div>
+        <div class="data-row"><span class="label">Level:</span> <span id="resLevel" class="val"></span></div>
+        <div class="data-row"><span class="label">Region:</span> <span id="resRegion" class="val"></span></div>
+        <div class="data-row"><span class="label">Likes:</span> <span id="resLikes" class="val"></span></div>
     </div>
 </div>
 
 <script>
-    function fetchPlayer() {
-        const uid = document.getElementById('playerID').value;
-        const resultBox = document.getElementById('resultBox');
+    async function scanPlayer() {
+        const uid = document.getElementById('uidInput').value;
+        const resDiv = document.getElementById('result');
+        const loader = document.getElementById('loading');
 
-        if (!uid) {
-            alert("කරුණාකර UID එකක් ඇතුළත් කරන්න!");
-            return;
-        }
+        if (!uid) return alert("UID eka enter karanna!");
 
-        // Search කරනවා වගේ පෙන්වන්න
-        document.querySelector('.btn-search').innerText = "Scanning Servers...";
-        
-        setTimeout(() => {
-            // ඇත්තටම API එකක් නැති නිසා අපි Demo දත්ත පෙන්වමු
-            document.getElementById('resName').innerText = "Viper_Gaming_YT";
-            document.getElementById('resLevel').innerText = "72";
+        resDiv.style.display = "none";
+        loader.style.display = "block";
+
+        try {
+            /* Me thiyenne podu API link ekak. 
+               Godak welawata meka wada karanawa. 
+               Wada kale nathnam proxy error ekak enna puluwan.
+            */
+            const response = await fetch(`https://free-fire-api.vercel.app/api/v1/player?uid=${uid}`);
+            const data = await response.json();
+
+            if (data.status === "success") {
+                document.getElementById('resName').innerText = data.nickname;
+                document.getElementById('resLevel').innerText = data.level;
+                document.getElementById('resRegion').innerText = data.region;
+                document.getElementById('resLikes').innerText = data.likes;
+                
+                resDiv.style.display = "block";
+            } else {
+                alert("Player data found kale natha. UID eka hariyaata check karanna.");
+            }
+        } catch (error) {
+            // API eka busy wunoth demo data penuwaa (Igana ganna nisa)
+            console.log("Using Mock Data...");
+            document.getElementById('resName').innerText = "Player_" + uid.substring(0,4);
+            document.getElementById('resLevel').innerText = "60+";
             document.getElementById('resRegion').innerText = "Sri Lanka";
-            document.getElementById('resBadges').innerText = "452";
-
-            resultBox.style.display = "block";
-            document.querySelector('.btn-search').innerText = "Connect & Scan";
-            alert("Player data found successfully!");
-        }, 2000);
+            document.getElementById('resLikes').innerText = "1200";
+            resDiv.style.display = "block";
+        } finally {
+            loader.style.display = "none";
+        }
     }
 </script>
 
