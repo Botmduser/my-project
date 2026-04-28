@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="si">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HTML Source Downloader</title>
+    <style>
+        body { font-family: sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; background-color: #f4f4f9; margin: 0; }
+        .container { background: white; padding: 2rem; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); text-align: center; width: 90%; max-width: 400px; }
+        input { width: 100%; padding: 12px; margin: 15px 0; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; }
+        button { background-color: #007bff; color: white; border: none; padding: 12px 20px; border-radius: 6px; cursor: pointer; width: 100%; font-size: 16px; }
+        button:hover { background-color: #0056b3; }
+        p { font-size: 12px; color: #666; margin-top: 15px; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>HTML Downloader</h2>
+    <p>Web link eka pahala enter karanna</p>
+    <input type="url" id="urlInput" placeholder="https://example.com" required>
+    <button onclick="downloadHTML()">Download Code</button>
+    <p id="status"></p>
+</div>
+
+<script>
+    async function downloadHTML() {
+        const url = document.getElementById('urlInput').value;
+        const status = document.getElementById('status');
+
+        if (!url) {
+            alert("Karunakara link ekak danna!");
+            return;
+        }
+
+        status.innerText = "Processing...";
+
+        try {
+            // Browser security (CORS) nisa kelinma ganna amarui, e nisa proxy ekak pavichchi karanawa
+            const proxyUrl = 'https://api.allorigins.win/get?url=' + encodeURIComponent(url);
+            const response = await fetch(proxyUrl);
+            const data = await response.json();
+            
+            if (data.contents) {
+                const blob = new Blob([data.contents], { type: 'text/html' });
+                const link = document.createElement('a');
+                link.href = URL.createObjectURL(blob);
+                link.download = "source-code.html";
+                link.click();
+                status.innerText = "Download Unu!";
+            } else {
+                status.innerText = "Error: Data ganna bari una.";
+            }
+        } catch (error) {
+            status.innerText = "Error: " + error.message;
+        }
+    }
+</script>
+
+</body>
+</html>
