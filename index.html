@@ -1,122 +1,86 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="si">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Auto HTML Downloader</title>
+    <title>My Profile | Link Tree</title>
     <style>
-        * { box-sizing: border-box; }
-        body { 
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
-            background: #f0f2f5; 
-            display: flex; 
-            justify-content: center; 
-            align-items: center; 
-            height: 100vh; 
-            margin: 0; 
+        /* CSS - Meken thamai design eka hadenne */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            color: white;
         }
-        .container { 
-            background: white; 
-            padding: 30px; 
-            border-radius: 12px; 
-            box-shadow: 0 8px 30px rgba(0,0,0,0.1); 
-            width: 90%; 
-            max-width: 450px; 
-            text-align: center; 
+
+        .container {
+            width: 90%;
+            max-width: 400px;
+            text-align: center;
+            padding: 20px;
         }
-        h2 { color: #1c1e21; margin-bottom: 10px; }
-        p { color: #606770; font-size: 14px; margin-bottom: 20px; }
-        input { 
-            width: 100%; 
-            padding: 12px; 
-            border: 1px solid #dddfe2; 
-            border-radius: 6px; 
-            font-size: 16px;
+
+        .profile-img {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            border: 3px solid white;
+            object-fit: cover;
             margin-bottom: 15px;
-            outline: none;
         }
-        input:focus { border-color: #1877f2; }
-        button { 
-            background-color: #1877f2; 
-            color: white; 
-            border: none; 
-            padding: 12px; 
-            width: 100%; 
-            border-radius: 6px; 
-            font-size: 16px; 
-            font-weight: bold; 
-            cursor: pointer; 
-            transition: background 0.2s;
+
+        h1 { font-size: 22px; margin-bottom: 10px; }
+        p { font-size: 14px; opacity: 0.8; margin-bottom: 30px; }
+
+        /* Links Buttons */
+        .link {
+            display: block;
+            background: white;
+            color: #333;
+            text-decoration: none;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 50px;
+            font-weight: 600;
+            transition: transform 0.2s, background 0.2s;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
         }
-        button:hover { background-color: #166fe5; }
-        #status { 
-            margin-top: 15px; 
-            padding: 10px;
-            border-radius: 6px;
-            font-size: 14px;
-            display: none;
+
+        /* Mouse eka link eka udata giyama wena de (Hover) */
+        .link:hover {
+            transform: scale(1.05);
+            background: #f0f0f0;
+            color: #764ba2;
+        }
+
+        .footer {
+            margin-top: 30px;
+            font-size: 12px;
+            opacity: 0.6;
         }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h2>HTML Code Getter</h2>
-    <p>Oyaata oni web link eka pahala enter karanna.</p>
-    
-    <input type="url" id="urlInput" value="https://exam-results-grade11-kns.vercel.app/" placeholder="https://example.com">
-    
-    <button onclick="downloadHTML()">Download Source Code</button>
-    
-    <div id="status"></div>
+    <img src="https://via.placeholder.com/100" alt="Profile Picture" class="profile-img">
+
+    <h1>Oyaage Nama</h1>
+    <p>Web Developer | Student | Tech Enthusiast</p>
+
+    <a href="https://facebook.com" class="link" target="_blank">Facebook</a>
+    <a href="https://whatsapp.com" class="link" target="_blank">WhatsApp Chat</a>
+    <a href="https://github.com" class="link" target="_blank">GitHub Portfolio</a>
+    <a href="https://youtube.com" class="link" target="_blank">YouTube Channel</a>
+
+    <div class="footer">
+        Created by Me © 2026
+    </div>
 </div>
-
-<script>
-    async function downloadHTML() {
-        const url = document.getElementById('urlInput').value;
-        const statusDiv = document.getElementById('status');
-
-        if (!url) {
-            alert("Karunakara link ekak enter karanna!");
-            return;
-        }
-
-        // Status update
-        statusDiv.style.display = "block";
-        statusDiv.style.backgroundColor = "#e7f3ff";
-        statusDiv.style.color = "#1877f2";
-        statusDiv.innerText = "Processing... Poddak inna...";
-
-        try {
-            // Me proxy eka auto-active wenawa
-            const finalUrl = 'https://corsproxy.io/?' + encodeURIComponent(url);
-            
-            const response = await fetch(finalUrl);
-            
-            if (!response.ok) throw new Error('Proxy error ekak awa. Site eka block karala wenna puluwan.');
-            
-            const htmlData = await response.text();
-
-            // Blob ekak hadala download link ekak create kirima
-            const blob = new Blob([htmlData], { type: 'text/html' });
-            const link = document.createElement('a');
-            link.href = URL.createObjectURL(blob);
-            link.download = "downloaded_source.html";
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-
-            statusDiv.style.backgroundColor = "#eafbe7";
-            statusDiv.style.color = "#28a745";
-            statusDiv.innerText = "Sarthakai! HTML file eka download una.";
-
-        } catch (error) {
-            statusDiv.style.backgroundColor = "#ffebe9";
-            statusDiv.style.color = "#d93025";
-            statusDiv.innerText = "Error: " + error.message;
-        }
-    }
-</script>
 
 </body>
 </html>
