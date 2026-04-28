@@ -1,86 +1,173 @@
 <!DOCTYPE html>
-<html lang="si">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Profile | Link Tree</title>
+    <title>FF PLAYER ADMIN PANEL</title>
     <style>
-        /* CSS - Meken thamai design eka hadenne */
+        /* Design එක හදන්නේ මෙතනින් */
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            margin: 0;
+            padding: 0;
+            font-family: 'Oxanium', sans-serif;
+            background: url('https://wallpaperaccess.com/full/1855234.jpg') no-repeat center center fixed;
+            background-size: cover;
+            color: white;
             display: flex;
             justify-content: center;
             align-items: center;
-            min-height: 100vh;
-            margin: 0;
-            color: white;
+            height: 100vh;
         }
 
-        .container {
+        .overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+        }
+
+        .panel-card {
+            position: relative;
+            background: rgba(20, 20, 20, 0.9);
+            border: 2px solid #ff4b2b;
+            border-radius: 15px;
+            padding: 30px;
             width: 90%;
-            max-width: 400px;
+            max-width: 450px;
             text-align: center;
-            padding: 20px;
+            box-shadow: 0 0 20px #ff4b2b;
         }
 
-        .profile-img {
-            width: 100px;
-            height: 100px;
-            border-radius: 50%;
-            border: 3px solid white;
-            object-fit: cover;
-            margin-bottom: 15px;
+        h2 {
+            color: #ff4b2b;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 20px;
         }
 
-        h1 { font-size: 22px; margin-bottom: 10px; }
-        p { font-size: 14px; opacity: 0.8; margin-bottom: 30px; }
+        .input-group {
+            margin-bottom: 20px;
+        }
 
-        /* Links Buttons */
-        .link {
-            display: block;
-            background: white;
-            color: #333;
-            text-decoration: none;
+        input {
+            width: 100%;
+            padding: 12px;
+            background: #333;
+            border: 1px solid #555;
+            border-radius: 5px;
+            color: white;
+            font-size: 16px;
+            outline: none;
+            text-align: center;
+        }
+
+        input:focus {
+            border-color: #ff4b2b;
+        }
+
+        .btn-search {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(to right, #ff416c, #ff4b2b);
+            border: none;
+            border-radius: 5px;
+            color: white;
+            font-weight: bold;
+            font-size: 16px;
+            cursor: pointer;
+            text-transform: uppercase;
+            transition: 0.3s;
+        }
+
+        .btn-search:hover {
+            transform: scale(1.02);
+            box-shadow: 0 0 15px #ff4b2b;
+        }
+
+        /* විස්තර පෙන්වන තැන */
+        #resultBox {
+            margin-top: 25px;
             padding: 15px;
-            margin-bottom: 15px;
-            border-radius: 50px;
-            font-weight: 600;
-            transition: transform 0.2s, background 0.2s;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            display: none; /* පස්සේ පෙන්වන්න */
+            text-align: left;
         }
 
-        /* Mouse eka link eka udata giyama wena de (Hover) */
-        .link:hover {
-            transform: scale(1.05);
-            background: #f0f0f0;
-            color: #764ba2;
+        .stat-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            border-bottom: 1px solid #444;
+            padding-bottom: 5px;
         }
 
-        .footer {
-            margin-top: 30px;
-            font-size: 12px;
-            opacity: 0.6;
-        }
+        .label { color: #aaa; }
+        .value { color: #00ffcc; font-weight: bold; }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <img src="https://via.placeholder.com/100" alt="Profile Picture" class="profile-img">
+<div class="overlay"></div>
 
-    <h1>Oyaage Nama</h1>
-    <p>Web Developer | Student | Tech Enthusiast</p>
+<div class="panel-card">
+    <h2>FF Admin Panel</h2>
+    <p style="font-size: 13px; color: #ccc;">Enter Player UID to Fetch Data</p>
 
-    <a href="https://facebook.com" class="link" target="_blank">Facebook</a>
-    <a href="https://whatsapp.com" class="link" target="_blank">WhatsApp Chat</a>
-    <a href="https://github.com" class="link" target="_blank">GitHub Portfolio</a>
-    <a href="https://youtube.com" class="link" target="_blank">YouTube Channel</a>
+    <div class="input-group">
+        <input type="number" id="playerID" placeholder="Enter Player UID (Ex: 123456789)">
+    </div>
 
-    <div class="footer">
-        Created by Me © 2026
+    <button class="btn-search" onclick="fetchPlayer()">Connect & Scan</button>
+
+    <div id="resultBox">
+        <div class="stat-item">
+            <span class="label">Nickname:</span>
+            <span class="value" id="resName">--</span>
+        </div>
+        <div class="stat-item">
+            <span class="label">Level:</span>
+            <span class="value" id="resLevel">--</span>
+        </div>
+        <div class="stat-item">
+            <span class="label">Region:</span>
+            <span class="value" id="resRegion">--</span>
+        </div>
+        <div class="stat-item">
+            <span class="label">Badges:</span>
+            <span class="value" id="resBadges">--</span>
+        </div>
     </div>
 </div>
+
+<script>
+    function fetchPlayer() {
+        const uid = document.getElementById('playerID').value;
+        const resultBox = document.getElementById('resultBox');
+
+        if (!uid) {
+            alert("කරුණාකර UID එකක් ඇතුළත් කරන්න!");
+            return;
+        }
+
+        // Search කරනවා වගේ පෙන්වන්න
+        document.querySelector('.btn-search').innerText = "Scanning Servers...";
+        
+        setTimeout(() => {
+            // ඇත්තටම API එකක් නැති නිසා අපි Demo දත්ත පෙන්වමු
+            document.getElementById('resName').innerText = "Viper_Gaming_YT";
+            document.getElementById('resLevel').innerText = "72";
+            document.getElementById('resRegion').innerText = "Sri Lanka";
+            document.getElementById('resBadges').innerText = "452";
+
+            resultBox.style.display = "block";
+            document.querySelector('.btn-search').innerText = "Connect & Scan";
+            alert("Player data found successfully!");
+        }, 2000);
+    }
+</script>
 
 </body>
 </html>
