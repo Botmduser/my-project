@@ -3,129 +3,117 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Web Source Downloader</title>
+    <title>Auto HTML Downloader</title>
     <style>
-        :root {
-            --primary: #4f46e5;
-            --bg: #f8fafc;
+        * { box-sizing: border-box; }
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            background: #f0f2f5; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            height: 100vh; 
+            margin: 0; 
         }
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: var(--bg);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
+        .container { 
+            background: white; 
+            padding: 30px; 
+            border-radius: 12px; 
+            box-shadow: 0 8px 30px rgba(0,0,0,0.1); 
+            width: 90%; 
+            max-width: 450px; 
+            text-align: center; 
         }
-        .card {
-            background: white;
-            padding: 2rem;
-            border-radius: 16px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
-            width: 100%;
-            max-width: 400px;
-            text-align: center;
-        }
-        h2 { color: #1e293b; margin-bottom: 8px; }
-        p { color: #64748b; font-size: 14px; margin-bottom: 24px; }
-        input {
-            width: 100%;
-            padding: 12px;
-            border: 2px solid #e2e8f0;
-            border-radius: 8px;
-            margin-bottom: 16px;
-            box-sizing: border-box;
+        h2 { color: #1c1e21; margin-bottom: 10px; }
+        p { color: #606770; font-size: 14px; margin-bottom: 20px; }
+        input { 
+            width: 100%; 
+            padding: 12px; 
+            border: 1px solid #dddfe2; 
+            border-radius: 6px; 
+            font-size: 16px;
+            margin-bottom: 15px;
             outline: none;
-            transition: border-color 0.2s;
         }
-        input:focus { border-color: var(--primary); }
-        button {
-            width: 100%;
-            padding: 12px;
-            background: var(--primary);
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: opacity 0.2s;
+        input:focus { border-color: #1877f2; }
+        button { 
+            background-color: #1877f2; 
+            color: white; 
+            border: none; 
+            padding: 12px; 
+            width: 100%; 
+            border-radius: 6px; 
+            font-size: 16px; 
+            font-weight: bold; 
+            cursor: pointer; 
+            transition: background 0.2s;
         }
-        button:active { opacity: 0.8; }
-        .footer {
-            margin-top: 20px;
-            font-size: 11px;
-            color: #94a3b8;
-        }
-        #status {
-            margin-top: 15px;
-            font-weight: bold;
-            font-size: 13px;
-        }
-        .proxy-link {
-            display: inline-block;
-            margin-top: 10px;
-            color: var(--primary);
-            text-decoration: none;
-            font-weight: bold;
+        button:hover { background-color: #166fe5; }
+        #status { 
+            margin-top: 15px; 
+            padding: 10px;
+            border-radius: 6px;
+            font-size: 14px;
+            display: none;
         }
     </style>
 </head>
 <body>
 
-<div class="card">
-    <h2>Downloader</h2>
-    <p>Website link eka paste karanna</p>
+<div class="container">
+    <h2>HTML Code Getter</h2>
+    <p>Oyaata oni web link eka pahala enter karanna.</p>
     
-    <input type="url" id="urlInput" placeholder="https://..." value="https://exam-results-grade11-kns.vercel.app/">
+    <input type="url" id="urlInput" value="https://exam-results-grade11-kns.vercel.app/" placeholder="https://example.com">
     
-    <button onclick="fetchAndDownload()">Download HTML</button>
+    <button onclick="downloadHTML()">Download Source Code</button>
     
     <div id="status"></div>
-
-    <div class="footer">
-        "Failed to fetch" awoth, pahala link ekata gihin <b>Request Access</b> click karala aye try karanna:<br>
-        <a href="https://cors-anywhere.herokuapp.com/corsdemo" target="_blank" class="proxy-link">Proxy eka Active karanna</a>
-    </div>
 </div>
 
 <script>
-    async function fetchAndDownload() {
+    async function downloadHTML() {
         const url = document.getElementById('urlInput').value;
-        const status = document.getElementById('status');
-        
+        const statusDiv = document.getElementById('status');
+
         if (!url) {
-            alert("URL ekak danna!");
+            alert("Karunakara link ekak enter karanna!");
             return;
         }
 
-        status.style.color = "blue";
-        status.innerText = "Downloading... Poddak inna...";
+        // Status update
+        statusDiv.style.display = "block";
+        statusDiv.style.backgroundColor = "#e7f3ff";
+        statusDiv.style.color = "#1877f2";
+        statusDiv.innerText = "Processing... Poddak inna...";
 
         try {
-            // Vercel sites block karana nisa Proxy eka use karanawa
-            const proxy = 'https://cors-anywhere.herokuapp.com/';
-            const response = await fetch(proxy + url);
+            // Me proxy eka auto-active wenawa
+            const finalUrl = 'https://corsproxy.io/?' + encodeURIComponent(url);
             
-            if (!response.ok) throw new Error('Proxy error');
+            const response = await fetch(finalUrl);
             
-            const htmlContent = await response.text();
+            if (!response.ok) throw new Error('Proxy error ekak awa. Site eka block karala wenna puluwan.');
+            
+            const htmlData = await response.text();
 
-            // File eka download karana widiha
-            const blob = new Blob([htmlContent], { type: 'text/html' });
-            const downloadLink = document.createElement('a');
-            downloadLink.href = URL.createObjectURL(blob);
-            downloadLink.download = "downloaded-page.html";
-            document.body.appendChild(downloadLink);
-            downloadLink.click();
-            document.body.removeChild(downloadLink);
+            // Blob ekak hadala download link ekak create kirima
+            const blob = new Blob([htmlData], { type: 'text/html' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = "downloaded_source.html";
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
 
-            status.style.color = "green";
-            status.innerText = "Sarthakai! File eka download una.";
+            statusDiv.style.backgroundColor = "#eafbe7";
+            statusDiv.style.color = "#28a745";
+            statusDiv.innerText = "Sarthakai! HTML file eka download una.";
+
         } catch (error) {
-            status.style.color = "red";
-            status.innerText = "Error: Proxy eka active karala naha.";
-            console.error(error);
+            statusDiv.style.backgroundColor = "#ffebe9";
+            statusDiv.style.color = "#d93025";
+            statusDiv.innerText = "Error: " + error.message;
         }
     }
 </script>
